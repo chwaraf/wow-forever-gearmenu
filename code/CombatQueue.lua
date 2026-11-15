@@ -23,7 +23,7 @@
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ]]--
 
--- luacheck: read globals GetItemInfo C_LossOfControl
+-- luacheck: read globals GetItemInfo C_LossOfControl issecretvalue
 
 local mod = rggm
 local me = {}
@@ -189,9 +189,8 @@ function me.IsCombatQueueEmpty()
 end
 
 --[[
-  Checks whether the player has a loss of control effect on him that prevents him from changing equipment.
-
-  Possible values for locType:
+  Whether a loss of control effect of the given locType prevents an equipment change. The type is
+  the only thing that tells a root, a silence or a disarm apart from a stun, fear or charm.
 
   | SCHOOL_INTERRUPT | IRRELEVANT |
   | DISARM           | IRRELEVANT |
@@ -207,30 +206,112 @@ end
   | CONFUSE          | RELEVANT   |
   | POSSESS          | RELEVANT   |
 ]]--
+local relevantLocTypes = {
+  ["SCHOOL_INTERRUPT"] = false,
+  ["DISARM"] = false,
+  ["PACIFYSILENCE"] = false,
+  ["SILENCE"] = false,
+  ["PACIFY"] = false,
+  ["ROOT"] = false,
+  ["STUN_MECHANIC"] = true,
+  ["STUN"] = true,
+  ["FEAR_MECHANIC"] = true,
+  ["FEAR"] = true,
+  ["CHARM"] = true,
+  ["CONFUSE"] = true,
+  ["POSSESS"] = true
+}
+
+--[[
+  The lowest loss-of-control priority that blocks an equipment change when the client withholds the
+  effect's locType. On the Forever client locType and every other field of the data are secret,
+  only priority and displayType stay readable, so a secret effect is judged by its priority. The
+  values follow the client's own ordering of the effect types: a root - the type an equipment
+  change is allowed under - is the lowest one, a stun, fear or charm a high one. An effect the
+  client does not report a readable priority for is blocked on: a swap that waits is only late,
+  while a swap that should not have been attempted cannot work anyway. The client documents the
+  withholding as SecretWhenLossOfControlInfoRestricted, see https://warcraft.wiki.gg/wiki/Secret_Values
+]]--
+local secretBlockingPriority = 2
+
+--[[
+  Whether `value` is one the client lets addon code read. A secret can be held, stored and handed
+  to an engine API, but not indexed, compared or concatenated: those raise "attempted to index a
+  table that cannot be indexed with secret keys" and friends. Without the client's predicate (a
+  client without secret values) every value counts as readable
+]]--
+local function IsReadable(value)
+  if issecretvalue == nil then return true end
+
+  return not issecretvalue(value)
+end
+
+--[[
+  Whether a single loss-of-control effect prevents an equipment change. The locType decides when
+  the client lets addon code read it; a secret locType falls back to the effect's priority, which
+  is one of the two fields the client never withholds
+
+  @param {table} event
+    One entry of C_LossOfControl.GetActiveLossOfControlData
+
+  @return {boolean}
+    true - if the effect blocks an equipment change
+    false - if the effect does not block an equipment change
+]]--
+local function IsBlockingLossOfControl(event)
+  if not IsReadable(event) then
+    --[[
+      Nothing to read - either no effect at all, or data the client withholds as a whole. The end of
+      every effect is reported with the next LOSS_OF_CONTROL_UPDATE, so holding a swap back is the
+      answer that cannot get stuck
+    ]]--
+    return event ~= nil
+  end
+
+  local locType = event.locType
+
+  if IsReadable(locType) then
+    --[[
+      An effect type the table above does not list does not block - which is what the plain table
+      lookup has always done, and an entry without a locType at all is no reason to hold a swap
+      back either
+    ]]--
+    if locType == nil then return false end
+
+    mod.logger.LogDebug(me.tag, "UpdateEquipChangeBlockStatus detected locType: " .. locType)
+
+    return relevantLocTypes[locType] == true
+  end
+
+  local priority = event.priority
+
+  if not IsReadable(priority) then
+    return true
+  end
+
+  mod.logger.LogDebug(me.tag, "UpdateEquipChangeBlockStatus detected secret locType with priority: "
+    .. tostring(priority))
+
+  if type(priority) ~= "number" then
+    return true
+  end
+
+  return priority >= secretBlockingPriority
+end
+
+--[[
+  Checks whether the player has a loss of control effect on him that prevents him from changing
+  equipment. The effects are read one at a time and judged by IsBlockingLossOfControl, because on
+  the Forever client their fields are secret: reading one - the locType in particular - raises a
+  Lua error instead of returning a value
+]]--
 function me.UpdateEquipChangeBlockStatus()
-  local relevantLocTypes = {
-    ["SCHOOL_INTERRUPT"] = false,
-    ["DISARM"] = false,
-    ["PACIFYSILENCE"] = false,
-    ["SILENCE"] = false,
-    ["PACIFY"] = false,
-    ["ROOT"] = false,
-    ["STUN_MECHANIC"] = true,
-    ["STUN"] = true,
-    ["FEAR_MECHANIC"] = true,
-    ["FEAR"] = true,
-    ["CHARM"] = true,
-    ["CONFUSE"] = true,
-    ["POSSESS"] = true
-  }
   local eventIndex = C_LossOfControl.GetActiveLossOfControlDataCount()
 
   while eventIndex > 0 do
     local event = C_LossOfControl.GetActiveLossOfControlData(eventIndex)
 
-    mod.logger.LogDebug(me.tag, "UpdateEquipChangeBlockStatus detected locType: " .. event.locType)
-
-    if relevantLocTypes[event.locType] then
+    if IsBlockingLossOfControl(event) then
       isEquipChangeBlocked = true
 
       return

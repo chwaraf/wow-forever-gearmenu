@@ -427,6 +427,27 @@ Headless coverage: `KeyBindProxySpec` (creation, mapping, deferral), `KeyBindRec
 (reads, writes, shift, profile pair, deferral queue) against the in-memory `BindingSet` and
 `FrameRegistry` stubs in `test/headless/WowStubs.lua`.
 
+## Secret Values
+
+The Forever client inherits Midnight's secret values: some API returns are values addon code can
+hold and pass on - to `FontString:SetText`, `StatusBar:SetValue` and the like - but cannot look at.
+Indexing, comparing, concatenating or doing arithmetic with one raises
+`attempted to index a table that cannot be indexed with secret keys` and friends, and the error
+lands in the player's error frame.
+
+Anything read from the client that the code then *reasons* about has to be checked with
+`issecretvalue` first, and a secret needs a fallback that does not need the value:
+
+- `C_LossOfControl.GetActiveLossOfControlData` returns every field but `priority` and
+  `displayType` secret (`SecretWhenLossOfControlInfoRestricted`). `CombatQueue` reads the `locType`
+  only when it is readable and otherwise judges the effect by its `priority` - see
+  `IsBlockingLossOfControl` and `TC-CQ-04` in [test/manual/](test/manual/)
+- Lua's own table identity stays usable: a secret can be a field value or a key the code merely
+  stores, it just cannot be compared or looked up *with*
+- `test/headless/WowStubs.lua` has `wowStubs.stubs.Secrets()` to reproduce the client in a spec. It
+  hands out secrets that refuse every operation the client refuses and provides the matching
+  `issecretvalue` to install, so a spec fails exactly where the client would
+
 ## Local Functions
 
 A file-private helper is a plain `local function Name()` defined above its first caller, so a

@@ -408,11 +408,17 @@ describe("CombatQueue", function()
   describe("UpdateEquipChangeBlockStatus / IsEquipChangeBlocked", function()
     --[[
       Installs a C_LossOfControl stub reporting `events` for the duration of `fn`, then restores it.
+      Pass `secrets` (from wowStubs.stubs.Secrets) when the events carry secret values: the client's
+      issecretvalue predicate is then installed alongside the stub, the way the real client has it
     ]]--
-    local function withLossOfControl(events, fn)
-      local restoreLoc = wowStubs.install({
-        C_LossOfControl = wowStubs.stubs.C_LossOfControl(events)
-      })
+    local function withLossOfControl(events, fn, secrets)
+      local stubs = { C_LossOfControl = wowStubs.stubs.C_LossOfControl(events) }
+
+      if secrets ~= nil then
+        stubs.issecretvalue = secrets.issecretvalue
+      end
+
+      local restoreLoc = wowStubs.install(stubs)
       fn()
       restoreLoc()
     end
@@ -440,6 +446,114 @@ describe("CombatQueue", function()
       end)
 
       assert.is_false(combatQueue.IsEquipChangeBlocked())
+    end)
+
+    it("does not block on an effect without data", function()
+      withLossOfControl({ nil }, function()
+        combatQueue.UpdateEquipChangeBlockStatus()
+      end)
+
+      assert.is_false(combatQueue.IsEquipChangeBlocked())
+    end)
+
+    --[[
+      The Forever client makes locType and every other field of the data secret, only priority and
+      displayType stay readable. Reading a secret locType raised "attempted to index a table that
+      cannot be indexed with secret keys" once per loss of control, see the secret specs below
+    ]]--
+    describe("with a secret locType (Forever client)", function()
+      it("does not raise for a secret locType and blocks on a high priority", function()
+        local secrets = wowStubs.stubs.Secrets()
+        local events = { { locType = secrets.Secret("STUN"), priority = 5, displayType = 2 } }
+
+        withLossOfControl(events, function()
+          assert.has_no.errors(function() combatQueue.UpdateEquipChangeBlockStatus() end)
+        end, secrets)
+
+        assert.is_true(combatQueue.IsEquipChangeBlocked())
+      end)
+
+      it("does not block on a low priority effect such as a root", function()
+        local secrets = wowStubs.stubs.Secrets()
+        local events = { { locType = secrets.Secret("ROOT"), priority = 1, displayType = 2 } }
+
+        withLossOfControl(events, function()
+          combatQueue.UpdateEquipChangeBlockStatus()
+        end, secrets)
+
+        assert.is_false(combatQueue.IsEquipChangeBlocked())
+        assert.are.equal(1, calls.startTicker)
+      end)
+
+      it("blocks on the lowest blocking priority", function()
+        local secrets = wowStubs.stubs.Secrets()
+        local events = { { locType = secrets.Secret("SILENCE"), priority = 2, displayType = 2 } }
+
+        withLossOfControl(events, function()
+          combatQueue.UpdateEquipChangeBlockStatus()
+        end, secrets)
+
+        assert.is_true(combatQueue.IsEquipChangeBlocked())
+      end)
+
+      it("blocks on a secret effect whose priority is secret as well", function()
+        local secrets = wowStubs.stubs.Secrets()
+        local events = {
+          { locType = secrets.Secret("ROOT"), priority = secrets.Secret(1), displayType = 2 }
+        }
+
+        withLossOfControl(events, function()
+          assert.has_no.errors(function() combatQueue.UpdateEquipChangeBlockStatus() end)
+        end, secrets)
+
+        assert.is_true(combatQueue.IsEquipChangeBlocked())
+      end)
+
+      it("blocks on a secret effect without a priority", function()
+        local secrets = wowStubs.stubs.Secrets()
+        local events = { { locType = secrets.Secret("ROOT"), displayType = 2 } }
+
+        withLossOfControl(events, function()
+          combatQueue.UpdateEquipChangeBlockStatus()
+        end, secrets)
+
+        assert.is_true(combatQueue.IsEquipChangeBlocked())
+      end)
+
+      it("blocks on an effect whose data is secret as a whole", function()
+        local secrets = wowStubs.stubs.Secrets()
+        local events = { secrets.Secret({ locType = "ROOT", priority = 1 }) }
+
+        withLossOfControl(events, function()
+          assert.has_no.errors(function() combatQueue.UpdateEquipChangeBlockStatus() end)
+        end, secrets)
+
+        assert.is_true(combatQueue.IsEquipChangeBlocked())
+      end)
+
+      it("keeps a queued swap while a secret effect blocks and works it off once it ends", function()
+        local secrets = wowStubs.stubs.Secrets()
+        local blocked = { { locType = secrets.Secret("STUN"), priority = 5, displayType = 2 } }
+
+        withLossOfControl(blocked, function()
+          combatQueue.UpdateEquipChangeBlockStatus()
+        end, secrets)
+
+        combatQueue.AddToQueue(12345, nil, 5)
+        rggm.gearManager.GetGearSlots = function() return { { slotId = 5 } } end
+        combatQueue.ProcessQueue()
+
+        assert.are.equal(0, #calls.equipped)
+
+        -- the effect ends: LOSS_OF_CONTROL_UPDATE reads no active effect and unblocks the queue
+        withLossOfControl({}, function()
+          combatQueue.UpdateEquipChangeBlockStatus()
+        end, secrets)
+        combatQueue.ProcessQueue()
+
+        assert.are.equal(1, #calls.equipped)
+        assert.are.equal(12345, calls.equipped[1].itemId)
+      end)
     end)
   end)
 end)

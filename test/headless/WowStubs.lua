@@ -116,6 +116,77 @@ function M.stubs.C_LossOfControl(events)
 end
 
 --[[
+  A secret value, as the Forever client hands fields of the loss-of-control data to addon code
+  (CombatQueue.UpdateEquipChangeBlockStatus). The wrapped value can be held, stored and passed on,
+  but the client refuses to look at it: indexing, comparing, arithmetic and concatenation raise the
+  error the client raises, so a spec pins that guarded code really never touches it.
+
+  The predicate the code under test calls is returned alongside, to be installed as `issecretvalue`:
+
+    local secrets = wowStubs.stubs.Secrets()
+    restore = wowStubs.install({ issecretvalue = secrets.issecretvalue })
+    local event = { locType = secrets.Secret("STUN") }
+
+  `wrapped` maps a secret back to the value it hides, so a spec can pin what leaked.
+
+  @param {table} wrapped
+    optional; the registry to record the wrapped values in - one is created when omitted
+  @return {table}
+    .Secret(value) - the secret holding `value`
+    .issecretvalue(value) - the client's predicate
+    .wrapped - the wrapper to wrapped-value map
+]]--
+function M.stubs.Secrets(wrapped)
+  wrapped = wrapped or {}
+  -- the client's error for the operations it refuses on a secret, see the "Secret keys" error
+  local refused = "attempted to index a table that cannot be indexed with secret keys"
+
+  local function refuse()
+    error(refused, 3)
+  end
+
+  --[[
+    Every operation an addon may not perform on a secret raises, so a spec fails as loudly as the
+    client would. A secret is a table, which compares and hashes by identity - the one thing the
+    client still allows on it
+  ]]--
+  local secretMeta = {
+    __index = refuse,
+    __newindex = refuse,
+    __eq = refuse,
+    __lt = refuse,
+    __le = refuse,
+    __concat = refuse,
+    __tostring = refuse,
+    __add = refuse,
+    __sub = refuse,
+    __mul = refuse,
+    __div = refuse,
+    __mod = refuse,
+    __pow = refuse,
+    __unm = refuse
+  }
+
+  local function Secret(value)
+    local secret = {}
+
+    wrapped[secret] = value
+
+    return setmetatable(secret, secretMeta)
+  end
+
+  local function issecretvalue(value)
+    return type(value) == "table" and wrapped[value] ~= nil
+  end
+
+  return {
+    Secret = Secret,
+    issecretvalue = issecretvalue,
+    wrapped = wrapped
+  }
+end
+
+--[[
   C_AddOns namespace (Logger.PrintLogMessage, Configuration.SetAddonVersion). `metadata` maps the
   requested key (e.g. "Title", "Version") to the value to return.
 
