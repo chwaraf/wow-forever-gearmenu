@@ -19,6 +19,7 @@
 - No Lua errors on login
 - A default gearbar is created containing three slots: upper trinket, lower trinket, head
   (`FirstTimeInitialization` in `code/Configuration.lua`)
-- All option tabs open and show default values (e.g. item quality filter at green/uncommon)
+- All option tabs open and show default values (e.g. item quality filter at green/uncommon,
+  "Enable Debug Log" unchecked)
 - After logout, `GearMenuConfiguration` in the SavedVariables file contains all fields from
   `CONFIGURATION_DEFAULTS` and `firstTimeInitializationDone = true`

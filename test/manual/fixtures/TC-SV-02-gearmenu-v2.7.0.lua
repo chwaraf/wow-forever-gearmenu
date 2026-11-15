@@ -2,8 +2,8 @@
   SavedVariables fixture for TC-SV-02 - upgrade from the previous release.
 
   This is the v2.7.0 configuration schema: no profiles, no
-  enableFallbackToBaseItem flag, no update notifier bookkeeping
-  (lastNotifiedVersion). It was recorded with a real client running the
+  enableFallbackToBaseItem flag, no enableDebugLog flag, no update notifier
+  bookkeeping (lastNotifiedVersion). It was recorded with a real client running the
   v2.7.0 build: two gearbars - "Default GearBar" (locked, vertical, three
   slots) and "Demo" (unlocked, horizontal, four slots) - each with their
   own position, sizes and change menu direction.

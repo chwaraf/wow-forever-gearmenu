@@ -448,6 +448,26 @@ Anything read from the client that the code then *reasons* about has to be check
   hands out secrets that refuse every operation the client refuses and provides the matching
   `issecretvalue` to install, so a spec fails exactly where the client would
 
+## Logging
+
+`code/Logger.lua` exposes the `Log*` functions for the addon's own diagnostics and the `PrintUser*`
+functions for player facing feedback. Only the former are gated:
+
+- `PrintUserMessage` / `PrintUserChatWarn` / `PrintUserChatError` always print. They are the
+  confirmation of an action the player took, so no switch may take them away
+- the log level comes from `RGGM_ENVIRONMENT.LOG_LEVEL` (`build-resources/*.properties`: debug for
+  development, error for release). The player facing "Enable Debug Log" option
+  (`configuration.IsDebugLogEnabled`, off by default, `gui/GeneralMenu.lua`) raises the level to
+  debug when it is on and caps it at warn when it is off - so a development build no longer floods
+  the chat frame unless asked to
+- `LogDebug` and the event log (`LogEvent`, one line per handled event, printed from
+  `Event.Dispatch`) need the option on. The event log additionally needs a build that ships it
+  (`addon.logEvent`), so a release stays free of event lines even with the option on
+
+The option is a client preference, not part of a profile (`code/Profile.lua` deliberately does not
+list `enableDebugLog`): importing someone else's setup should not switch on a log the player did not
+ask for. `LoggerSpec` covers the gating, `TC-OPT-01` the in-game behavior.
+
 ## Local Functions
 
 A file-private helper is a plain `local function Name()` defined above its first caller, so a

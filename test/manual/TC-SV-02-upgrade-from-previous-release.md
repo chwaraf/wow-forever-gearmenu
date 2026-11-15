@@ -41,7 +41,7 @@
   scalar options, and the empty `quickChangeRules` / `frames` containers stay empty — no rules
   or frame positions are invented
 - Fields introduced after v2.7.0 are present at their defaults:
-  `enableFallbackToBaseItem = false`, `lastNotifiedVersion = ""`
+  `enableFallbackToBaseItem = false`, `enableDebugLog = false`, `lastNotifiedVersion = ""`
 - `GearMenuConfiguration.profiles` is created and holds **exactly one** entry named `Default`,
   seeded by `EnsureDefaultProfile()` as a snapshot of the shipped configuration defaults —
   **not** a snapshot of the imported v2.7.0 values — and `GearMenuConfiguration.activeProfile`

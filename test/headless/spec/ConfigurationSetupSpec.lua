@@ -233,6 +233,7 @@ describe("Configuration setup", function()
       assert.is_false(config.enableSimpleTooltips)
       assert.is_false(config.enableFastPress)
       assert.is_false(config.lockTrinketMenuFrame)
+      assert.is_false(config.enableDebugLog)
     end)
 
     it("preserves a saved false value for a field whose default is true", function()
@@ -366,6 +367,37 @@ describe("Configuration setup", function()
       configuration.SaveUserPlacedFramePosition("GM_TrinketMenu", "TOP", { "a frame object" }, "TOP", 12, -34)
 
       assert.are.same({ point = "TOP", relativePoint = "TOP", posX = 12, posY = -34 }, config.frames.GM_TrinketMenu)
+    end)
+  end)
+
+  describe("debug log toggle", function()
+    it("ships switched off", function()
+      local config = useConfig({ firstTimeInitializationDone = true })
+
+      configuration.SetupConfiguration()
+
+      assert.is_false(config.enableDebugLog)
+      assert.is_false(configuration.IsDebugLogEnabled())
+    end)
+
+    it("is switched on and off by its accessors", function()
+      useConfig({ firstTimeInitializationDone = true })
+
+      configuration.EnableDebugLog()
+      assert.is_true(configuration.IsDebugLogEnabled())
+
+      configuration.DisableDebugLog()
+      assert.is_false(configuration.IsDebugLogEnabled())
+    end)
+
+    it("treats only a real true as enabled", function()
+      local config = useConfig({ firstTimeInitializationDone = true, enableDebugLog = "true" })
+
+      configuration.SetupConfiguration()
+
+      -- a hand-edited SavedVariables value that is merely truthy must not switch the log on
+      assert.are.equal("true", config.enableDebugLog)
+      assert.is_false(configuration.IsDebugLogEnabled())
     end)
   end)
 

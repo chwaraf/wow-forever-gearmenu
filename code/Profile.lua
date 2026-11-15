@@ -73,6 +73,9 @@ local ADDON_TAG = "GearMenu"
   live configuration belongs to is not a setting of that profile) and the profile
   store itself (profiles). Types mirror the defaults in code/Configuration.lua (note
   gearBars defaults to nil there, hence the explicit "table").
+
+  Client preferences rather than gear setup also stay out: enableDebugLog is a
+  diagnostic switch for this client, so importing a setup must not turn a log on.
 ]]--
 local PROFILE_FIELD_SPEC = {
   { ["name"] = "enableTooltips",           ["type"] = "boolean" },

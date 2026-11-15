@@ -189,6 +189,12 @@ local CONFIGURATION_DEFAULTS = {
   ]]--
   { ["name"] = "enableFallbackToBaseItem", ["default"] = false },
   --[[
+    Whether the addon logs debug and event lines to the chat frame. Off by default - the log is a
+    development aid, and the event log alone prints on every event the addon handles (BAG_UPDATE
+    fires once per bag)
+  ]]--
+  { ["name"] = "enableDebugLog", ["default"] = false },
+  --[[
     Named configuration profiles keyed by the user given name. Each entry is a
     snapshot of the configurable fields (see code/Profile.lua me.PROFILE_FIELDS)
   ]]--
@@ -702,8 +708,28 @@ function me.IsFallbackToBaseItemEnabled()
   return GearMenuConfiguration.enableFallbackToBaseItem
 end
 
+--[[
+  Enable the debug log - LogDebug and the event log print to the chat frame from here on
+]]--
+function me.EnableDebugLog()
+  GearMenuConfiguration.enableDebugLog = true
+end
 
+--[[
+  Disable the debug log
+]]--
+function me.DisableDebugLog()
+  GearMenuConfiguration.enableDebugLog = false
+end
 
+--[[
+  @return {boolean}
+    true - if the debug log is enabled
+    false - if the debug log is disabled
+]]--
+function me.IsDebugLogEnabled()
+  return GearMenuConfiguration.enableDebugLog == true
+end
 
 --[[
   Save the position of a frame in the addon variables allowing to persist its position. The frame

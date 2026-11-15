@@ -261,6 +261,10 @@ GearMenu can show item tooltips when hovering items in its slots and change menu
 
 Enable whether an item in a Gearslot should be used when the player presses the key down (keydown) or only after the key is released (keyup).
 
+#### Debug Log
+
+Off by default. Switches GearMenu's diagnostic output on and writes it to the chat frame: the debug lines plus one line per game event the addon handles. Without it GearMenu only reports errors and warnings, which is all a normal session needs. Turn it on to report a problem - the log output is the part of a bug report that usually explains what happened.
+
 #### Filter Items by Quality
 
 Not interested in seeing items with a quality level below a certain level? Filter them out and only items that meet your set level will be considered to be displayed in GearMenu.
@@ -317,7 +321,7 @@ This is what we call a Lua error, and it usually happens because of an oversight
 
 #### GearMenu spams my chat with messages. How can I deactivate this?
 
-Those obnoxious messages are intended for the development of this addon and mean that you are running a development version of the addon instead of a proper release. Releases can be downloaded from here - https://github.com/RagedUnicorn/wow-forever-gearmenu/releases
+Those messages are GearMenu's diagnostic output. It is switched off by default: open `/rggm opt` and clear the checkbox "Enable Debug Log" under general settings. Releases can be downloaded from here - https://github.com/RagedUnicorn/wow-forever-gearmenu/releases
 
 #### A certain item is not showing up when I hover a slot. Why is that?
 

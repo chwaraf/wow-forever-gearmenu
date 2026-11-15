@@ -37,6 +37,8 @@ if (GetLocale() == "zhCN") then
   rggm.L["enable_unequip_slot_tooltip"] = "允许将一个空槽添加到切换菜单。这样可以更轻松地卸下装备"
   rggm.L["enable_fallback_to_base_item"] = "回退到基础物品"
   rggm.L["enable_fallback_to_base_item_tooltip"] = "当背包中找不到附魔完全一致的物品时，改为装备同一物品的普通副本。装备替代副本时会在聊天框中显示警告"
+  rggm.L["enable_debug_log"] = "启用调试日志"
+  rggm.L["enable_debug_log_tooltip"] = "将 GearMenu 的调试信息和处理的每个事件输出到聊天框。用于排查问题 - 关闭时仅报告错误和警告"
   rggm.L["filter_item_quality"] = "过滤物品品质:"
   rggm.L["item_quality_poor"] = "灰色"
   rggm.L["item_quality_common"] = "白色"

@@ -69,6 +69,12 @@ One file per test case under [test/manual/](manual/). Case IDs follow `TC-<AREA>
 | [TC-GB-10](manual/TC-GB-10-click-empty-gearslot.md)   | Click an empty gearslot               |
 | [TC-GB-11](manual/TC-GB-11-slot-look.md)              | Slots render in the action-button look |
 
+### General options
+
+| ID                                                | Case                                         |
+|---------------------------------------------------|----------------------------------------------|
+| [TC-OPT-01](manual/TC-OPT-01-enable-debug-log.md) | Enable Debug Log switches the log on and off |
+
 ### ChangeMenu & swapping
 
 | ID                                               | Case                           |

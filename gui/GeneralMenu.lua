@@ -69,6 +69,12 @@ local enableFallbackToBaseItemMetaData = {
   rggm.L["enable_fallback_to_base_item_tooltip"]
 }
 
+local enableDebugLogMetaData = {
+  "EnableDebugLog",
+  rggm.L["enable_debug_log"],
+  rggm.L["enable_debug_log_tooltip"]
+}
+
 -- track whether the menu was already built
 local builtMenu = false
 
@@ -138,6 +144,15 @@ function me.BuildUi(parentFrame)
     me.EnableFallbackToBaseItemOnShow,
     me.EnableFallbackToBaseItemOnClick,
     enableFallbackToBaseItemMetaData
+  )
+
+  mod.uiHelper.BuildCheckButtonOption(
+    parentFrame,
+    RGGM_CONSTANTS.ELEMENT_GENERAL_OPT_ENABLE_DEBUG_LOG,
+    {"TOPLEFT", 280, -210},
+    me.EnableDebugLogOnShow,
+    me.EnableDebugLogOnClick,
+    enableDebugLogMetaData
   )
 
   me.CreateItemQualityLabel(parentFrame)
@@ -400,5 +415,33 @@ function me.EnableFallbackToBaseItemOnClick(self)
     mod.configuration.EnableFallbackToBaseItem()
   else
     mod.configuration.DisableFallbackToBaseItem()
+  end
+end
+
+--[[
+  OnShow callback for checkbuttons - enable the debug log
+
+  @param {table} self
+]]--
+function me.EnableDebugLogOnShow(self)
+  if mod.configuration.IsDebugLogEnabled() then
+    self:SetChecked(true)
+  else
+    self:SetChecked(false)
+  end
+end
+
+--[[
+  OnClick callback for checkbuttons - enable the debug log
+
+  @param {table} self
+]]--
+function me.EnableDebugLogOnClick(self)
+  local enabled = self:GetChecked()
+
+  if enabled then
+    mod.configuration.EnableDebugLog()
+  else
+    mod.configuration.DisableDebugLog()
   end
 end
