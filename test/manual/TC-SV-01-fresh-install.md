@@ -17,7 +17,7 @@
 ## Expected
 
 - No Lua errors on login
-- A default gearbar is created containing three slots: upper trinket, lower trinket, head
+- A default gearbar is created containing four slots: upper trinket, lower trinket, head, feet
   (`FirstTimeInitialization` in `code/Configuration.lua`)
 - All option tabs open and show default values (e.g. item quality filter at green/uncommon,
   "Enable Debug Log" unchecked)

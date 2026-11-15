@@ -66,7 +66,7 @@ end
   defaults and mirroring, so the reset ends with this bar in both the live configuration
   and the active profile.
 ]]--
-local STARTER_GEAR_BAR = { id = 100001, displayName = "Default GearBar", slots = { 13, 14, 1 } }
+local STARTER_GEAR_BAR = { id = 100001, displayName = "Default GearBar", slots = { 13, 14, 1, 8 } }
 
 describe("Profile", function()
   local profile = rggm.profile

@@ -319,7 +319,7 @@ profile like any other. The factory settings are not a profile any more -
 `ResetActiveProfile()` applies `BuildDefaultSnapshot()` (`GetDefaults()`, the userOwned
 collections empty) to the live configuration, runs
 `Configuration.FirstTimeInitialization()` so the starter "Default GearBar" (trinket 1 /
-trinket 2 / head) comes back like on a fresh install, and mirrors the result into the
+trinket 2 / head / feet) comes back like on a fresh install, and mirrors the result into the
 active profile.
 
 **Switch, delete, export.** `SwitchProfile(name)` mirrors, applies `store[name]` and

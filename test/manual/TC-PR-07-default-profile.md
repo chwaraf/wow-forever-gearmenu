@@ -36,7 +36,7 @@
   goes back to its default and the gearbars and QuickChange rules are replaced by the
   starter gearbar
 - After the reload of step 5 the character is in the fresh-install state: a single
-  "Default GearBar" with upper trinket, lower trinket and head, no QuickChange rules, the
+  "Default GearBar" with upper trinket, lower trinket, head and feet, no QuickChange rules, the
   item quality filter at Uncommon, TrinketMenu enabled; the key bound in
   step 3 does nothing; the list still reads "Scratch (active)"
 - `Default` was not touched by the reset: after step 6 the gearbar, the Epic filter and

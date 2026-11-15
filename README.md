@@ -203,6 +203,8 @@ To show the configuration screen use `/rggm opt` while in-game and `/rggm` for a
 
 With the latest release it is possible to create multiple GearBars that can act independently of each other.
 
+A fresh install starts with one bar, the **Default GearBar**: upper trinket, lower trinket, head and feet. The trinkets are what the addon was built for; the feet slot is there for the engineering boots (Goblin Rocket Boots, Gnomish Rocket Boots, ...) that an engineer wears for the sprint and swaps straight back out - the one engineering item on a worn slot that gets swapped often enough to be worth a slot out of the box.
+
 ![](docs/gm_create_gearbar.gif)
 
 ### Configure a GearBar

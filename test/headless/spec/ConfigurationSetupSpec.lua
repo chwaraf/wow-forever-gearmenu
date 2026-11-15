@@ -41,6 +41,9 @@
   addon metadata comes from wowStubs.install.
 ]]--
 
+-- WoW inventory slot ids are defined by test/headless/Bootstrap.lua at runtime
+-- luacheck: read globals INVSLOT_TRINKET1 INVSLOT_TRINKET2 INVSLOT_HEAD INVSLOT_FEET
+
 local wowStubs = require("WowStubs")
 
 --[[
@@ -454,6 +457,65 @@ describe("Configuration setup", function()
       configuration.EnableMinimapButton()
 
       assert.are.equal(137.5, config.minimapButton.minimapPos)
+    end)
+  end)
+
+  describe("FirstTimeInitialization", function()
+    -- the starter bar is built from AddGearSlot + UpdateGearSlot pairs; record what lands where
+    local slotIdsByPosition
+    local addedSlots
+
+    before_each(function()
+      slotIdsByPosition = {}
+      addedSlots = {}
+
+      rggm.gearBarManager.AddGearSlot = function(gearBarId, init)
+        addedSlots[#addedSlots + 1] = { gearBarId = gearBarId, init = init }
+      end
+      rggm.gearBarManager.UpdateGearSlot = function(gearBarId, position, gearSlot, init)
+        slotIdsByPosition[position] = { slotId = gearSlot.slotId, gearBarId = gearBarId, init = init }
+      end
+    end)
+
+    it("creates the starter gearBar with both trinkets, head and feet", function()
+      local config = useConfig({ firstTimeInitializationDone = false, gearBars = {} })
+
+      configuration.FirstTimeInitialization()
+
+      assert.are.equal(1, calls.addGearBar.count)
+      assert.are.same(
+        { INVSLOT_TRINKET1, INVSLOT_TRINKET2, INVSLOT_HEAD, INVSLOT_FEET },
+        { slotIdsByPosition[1].slotId, slotIdsByPosition[2].slotId, slotIdsByPosition[3].slotId,
+          slotIdsByPosition[4].slotId }
+      )
+      -- one slot was added per position
+      assert.are.equal(4, #addedSlots)
+      -- the bar itself is appended by the real AddGearBar, which the stub mirrors
+      assert.are.equal(1, #config.gearBars)
+      assert.is_true(config.firstTimeInitializationDone)
+    end)
+
+    it("appends the feet slot instead of inserting it", function()
+      useConfig({ firstTimeInitializationDone = false, gearBars = {} })
+
+      configuration.FirstTimeInitialization()
+
+      -- the engineering boots slot is last: positions 1-3 are what every older bar already had
+      assert.are.equal(INVSLOT_FEET, slotIdsByPosition[4].slotId)
+      assert.is_nil(slotIdsByPosition[5])
+    end)
+
+    it("builds the starter bar without a ui update", function()
+      useConfig({ firstTimeInitializationDone = false, gearBars = {} })
+
+      configuration.FirstTimeInitialization()
+
+      for _, added in ipairs(addedSlots) do
+        assert.is_true(added.init)
+      end
+      for position in pairs(slotIdsByPosition) do
+        assert.is_true(slotIdsByPosition[position].init)
+      end
     end)
   end)
 

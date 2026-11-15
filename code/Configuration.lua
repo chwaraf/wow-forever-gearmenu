@@ -363,7 +363,14 @@ function me.IsVersionBefore(version, otherVersion)
 end
 
 --[[
-  First time initialization. Create a basic default gearBar
+  First time initialization. Create a basic default gearBar.
+
+  The starter bar carries both trinkets, the head and the feet slot. Trinkets are what the addon
+  is for; the feet slot is there for the engineering boots (Goblin Rocket Boots, Gnomish Rocket
+  Boots, ...) that are worn for the sprint and swapped back out immediately after - the one
+  engineering item on a worn slot that is swapped often enough that every engineer would otherwise
+  add the slot by hand before the bar is of any use to them. The head slot stands for the
+  "equip a set piece back" case.
 ]]--
 function me.FirstTimeInitialization()
   mod.logger.LogInfo(me.tag, "First initialization detected. Creating default gearBar")
@@ -377,6 +384,9 @@ function me.FirstTimeInitialization()
 
   mod.gearBarManager.AddGearSlot(gearBar.id, true)
   mod.gearBarManager.UpdateGearSlot(gearBar.id, 3, mod.gearManager.GetGearSlotForSlotId(INVSLOT_HEAD), true)
+
+  mod.gearBarManager.AddGearSlot(gearBar.id, true)
+  mod.gearBarManager.UpdateGearSlot(gearBar.id, 4, mod.gearManager.GetGearSlotForSlotId(INVSLOT_FEET), true)
 
   GearMenuConfiguration.firstTimeInitializationDone = true
 end
