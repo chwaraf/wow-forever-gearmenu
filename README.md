@@ -251,6 +251,14 @@ When switching the orientation, you can also choose the direction in which the C
 
 ![](docs/gm_vertical_and_horizontal_gearbar.png)
 
+### Minimap Button
+
+GearMenu puts an icon on the minimap. Left click opens the options, right click hides the icon (there is a checkbox to bring it back, see below).
+
+The icon is a **LibDataBroker** launcher drawn by **LibDBIcon** - the same two libraries almost every addon with a minimap button uses, and the ones minimap addons look for. That matters if you run something like Leatrix Plus, SexyMap or a button collector: they discover addon buttons by walking LibDBIcon's registry, so the GearMenu icon gets sized, sorted, tucked into the button bag and faded out with the minimap together with all the others, instead of being treated as a "non-standard button" and replaced by a stand-in. Both libraries ship inside the addon, so nothing has to be installed separately, and an addon that brings its own copy just shares it (LibStub hands out the newest version).
+
+The position you drag the icon to is remembered per character. Hide and show it under *General Configuration* → "Show Minimap Button".
+
 ### General Configuration
 
 #### Tooltips
@@ -260,6 +268,10 @@ GearMenu can show item tooltips when hovering items in its slots and change menu
 #### FastPress Support
 
 Enable whether an item in a Gearslot should be used when the player presses the key down (keydown) or only after the key is released (keyup).
+
+#### Show Minimap Button
+
+Whether the icon on the minimap is shown. Hiding it only hides the icon - everything else, including the keybindings, keeps working, and `/rggm opt` still opens the options.
 
 #### Debug Log
 

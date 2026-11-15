@@ -117,8 +117,8 @@ describe("Core event wiring", function()
     registeredUnitEvents = {}
 
     for _, name in ipairs({
-      "cmd", "configuration", "profile", "addonConfiguration", "keyBindProxy", "gearBar",
-      "gearBarChangeMenu", "trinketMenu", "keyBind", "comm", "target", "ticker", "combatQueue",
+      "cmd", "configuration", "profile", "minimapButton", "addonConfiguration", "keyBindProxy",
+      "gearBar", "gearBarChangeMenu", "trinketMenu", "keyBind", "comm", "target", "ticker", "combatQueue",
       "quickChange", "itemLocationCache", "itemManager", "common"
     }) do
       rggm[name] = recorder(name)

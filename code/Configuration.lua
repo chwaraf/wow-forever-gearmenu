@@ -195,6 +195,12 @@ local CONFIGURATION_DEFAULTS = {
   ]]--
   { ["name"] = "enableDebugLog", ["default"] = false },
   --[[
+    Minimap button state, in the shape LibDBIcon-1.0 owns: hide, lock and the dragged position
+    (minimapPos, degrees). LibDBIcon writes into this table directly while the player drags the
+    icon or when a minimap addon hides it, so it is the addon's storage for the icon - not a copy
+  ]]--
+  { ["name"] = "minimapButton", ["default"] = { ["hide"] = false, ["minimapPos"] = 220 } },
+  --[[
     Named configuration profiles keyed by the user given name. Each entry is a
     snapshot of the configurable fields (see code/Profile.lua me.PROFILE_FIELDS)
   ]]--
@@ -729,6 +735,30 @@ end
 ]]--
 function me.IsDebugLogEnabled()
   return GearMenuConfiguration.enableDebugLog == true
+end
+
+--[[
+  Enable the minimap button
+]]--
+function me.EnableMinimapButton()
+  GearMenuConfiguration.minimapButton.hide = false
+end
+
+--[[
+  Disable the minimap button. The icon stays registered with LibDBIcon, so enabling it again takes
+  effect immediately - hiding is a display state, not a teardown
+]]--
+function me.DisableMinimapButton()
+  GearMenuConfiguration.minimapButton.hide = true
+end
+
+--[[
+  @return {boolean}
+    true - if the minimap button is shown
+    false - if the minimap button is hidden
+]]--
+function me.IsMinimapButtonEnabled()
+  return GearMenuConfiguration.minimapButton.hide ~= true
 end
 
 --[[

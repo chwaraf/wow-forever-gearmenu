@@ -11,6 +11,9 @@
 ## Category: RagedUnicorn
 ${addon.comment.generated.toc}
 
+# embedded libraries (LibStub, CallbackHandler-1.0, LibDataBroker-1.1, LibDBIcon-1.0)
+libs/embeds.xml
+
 # constant values
 code/Constants.lua
 # environment variables
@@ -59,6 +62,7 @@ gui/GearBarConfigurationSubMenu.lua
 gui/ProfileMenu.lua
 gui/AddonConfiguration.lua
 gui/AboutContent.lua
+gui/MinimapButton.lua
 gui/GeneralMenu.lua
 gui/TrinketConfigurationMenu.lua
 gui/QuickChangeMenu.lua

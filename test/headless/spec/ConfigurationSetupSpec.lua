@@ -236,6 +236,38 @@ describe("Configuration setup", function()
       assert.is_false(config.enableDebugLog)
     end)
 
+    it("backfills the minimap button state with the icon visible", function()
+      local config = useConfig({ firstTimeInitializationDone = true })
+
+      configuration.SetupConfiguration()
+
+      assert.is_false(config.minimapButton.hide)
+      assert.are.equal(220, config.minimapButton.minimapPos)
+      assert.is_true(configuration.IsMinimapButtonEnabled())
+    end)
+
+    it("keeps a stored minimap button position and hidden flag", function()
+      local config = useConfig({
+        firstTimeInitializationDone = true,
+        minimapButton = { hide = true, minimapPos = 45 }
+      })
+
+      configuration.SetupConfiguration()
+
+      assert.is_true(config.minimapButton.hide)
+      assert.are.equal(45, config.minimapButton.minimapPos)
+      assert.is_false(configuration.IsMinimapButtonEnabled())
+    end)
+
+    it("fills a missing minimapButton field without dropping the stored one", function()
+      local config = useConfig({ firstTimeInitializationDone = true, minimapButton = { minimapPos = 90 } })
+
+      configuration.SetupConfiguration()
+
+      assert.are.equal(90, config.minimapButton.minimapPos)
+      assert.is_false(config.minimapButton.hide)
+    end)
+
     it("preserves a saved false value for a field whose default is true", function()
       local config = useConfig({ firstTimeInitializationDone = true, enableTooltips = false })
 
@@ -398,6 +430,30 @@ describe("Configuration setup", function()
       -- a hand-edited SavedVariables value that is merely truthy must not switch the log on
       assert.are.equal("true", config.enableDebugLog)
       assert.is_false(configuration.IsDebugLogEnabled())
+    end)
+  end)
+
+  describe("minimap button toggle", function()
+    it("shows and hides the icon through its accessors", function()
+      useConfig({ firstTimeInitializationDone = true, minimapButton = { hide = false, minimapPos = 220 } })
+
+      configuration.DisableMinimapButton()
+      assert.is_false(configuration.IsMinimapButtonEnabled())
+
+      configuration.EnableMinimapButton()
+      assert.is_true(configuration.IsMinimapButtonEnabled())
+    end)
+
+    it("keeps the dragged position when the icon is hidden and shown again", function()
+      local config = useConfig({
+        firstTimeInitializationDone = true,
+        minimapButton = { hide = false, minimapPos = 137.5 }
+      })
+
+      configuration.DisableMinimapButton()
+      configuration.EnableMinimapButton()
+
+      assert.are.equal(137.5, config.minimapButton.minimapPos)
     end)
   end)
 

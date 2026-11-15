@@ -108,6 +108,18 @@ function me.GetCategoryId(key)
 end
 
 --[[
+  Whether a settings category was registered, i.e. can be opened through Settings.OpenToCategory
+
+  @param {string} key
+    One of "main", "general", "trinketMenu", "quickChange", "profile" or "gearBar"
+
+  @return {boolean}
+]]--
+function me.IsCategoryRegistered(key)
+  return categoryIds[key] ~= nil
+end
+
+--[[
   Create addon configuration menu(s)
 ]]--
 function me.SetupAddonConfiguration()

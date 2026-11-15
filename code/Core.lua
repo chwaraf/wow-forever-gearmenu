@@ -68,6 +68,8 @@ local function Initialize()
   -- applied above), then adopt the active profile and mirror the live configuration into it
   me.profile.EnsureDefaultProfile()
   me.profile.EnsureActiveProfile()
+  -- create the minimap button (needs the configuration above for its saved position)
+  me.minimapButton.Setup()
   -- setup addon configuration ui
   me.addonConfiguration.SetupAddonConfiguration()
   -- create the hidden key-bind proxies the bindings target (before the gearBars that name them)

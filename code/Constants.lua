@@ -75,6 +75,11 @@ RGGM_CONSTANTS = {
   ELEMENT_ADDON_PANEL = "GM_AddonPanel",
   ELEMENT_TOOLTIP = "GameTooltip", -- default blizzard frames tooltip
   --[[
+    Minimap button - the texture is the addon icon the .toc advertises, the same one the Blizzard
+    addon list and the CurseForge/Wago listings show
+  ]]--
+  MINIMAP_BUTTON_ICON = "Interface\\AddOns\\GearMenu\\assets\\gearmenu_icon",
+  --[[
     CooldownOverlay GearBar and ChangeMenu
   ]]--
   GEAR_BAR_COOLDOWN_TEXT_MODIFIER = 0.375,
@@ -207,6 +212,7 @@ RGGM_CONSTANTS = {
   ELEMENT_GENERAL_OPT_ENABLE_UNEQUIP_SLOT = "GM_OptEnableUnequipSlot",
   ELEMENT_GENERAL_OPT_ENABLE_FALLBACK_TO_BASE_ITEM = "GM_OptEnableFallbackToBaseItem",
   ELEMENT_GENERAL_OPT_ENABLE_DEBUG_LOG = "GM_OptEnableDebugLog",
+  ELEMENT_GENERAL_OPT_ENABLE_MINIMAP_BUTTON = "GM_OptEnableMinimapButton",
   ELEMENT_GENERAL_OPT_FILTER_ITEM_QUALITY = "GM_OptFilterItemQuality",
   ELEMENT_GENERAL_LABEL_FILTER_ITEM_QUALITY = "GM_LabelFilterItemQuality",
   --[[

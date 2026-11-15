@@ -107,6 +107,8 @@ GearMenuConfiguration = {
   enableDragAndDrop = true,
   enableFastPress = false,
   enableUnequipSlot = true,
+  enableDebugLog = false,
+  minimapButton = { ["hide"] = false, ["minimapPos"] = 220 },
   filterItemQuality = 2,
   gearBars = {},
   quickChangeRules = {},

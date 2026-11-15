@@ -75,6 +75,12 @@ local enableDebugLogMetaData = {
   rggm.L["enable_debug_log_tooltip"]
 }
 
+local enableMinimapButtonMetaData = {
+  "EnableMinimapButton",
+  rggm.L["enable_minimap_button"],
+  rggm.L["enable_minimap_button_tooltip"]
+}
+
 -- track whether the menu was already built
 local builtMenu = false
 
@@ -153,6 +159,15 @@ function me.BuildUi(parentFrame)
     me.EnableDebugLogOnShow,
     me.EnableDebugLogOnClick,
     enableDebugLogMetaData
+  )
+
+  mod.uiHelper.BuildCheckButtonOption(
+    parentFrame,
+    RGGM_CONSTANTS.ELEMENT_GENERAL_OPT_ENABLE_MINIMAP_BUTTON,
+    {"TOPLEFT", 280, -285},
+    me.EnableMinimapButtonOnShow,
+    me.EnableMinimapButtonOnClick,
+    enableMinimapButtonMetaData
   )
 
   me.CreateItemQualityLabel(parentFrame)
@@ -443,5 +458,39 @@ function me.EnableDebugLogOnClick(self)
     mod.configuration.EnableDebugLog()
   else
     mod.configuration.DisableDebugLog()
+  end
+end
+
+--[[
+  OnShow callback for checkbuttons - show the minimap button
+
+  The icon lives in LibDBIcon, which reads its hide flag from the saved table on every show, so
+  toggling only writes the flag - no re-registration and no reload
+  @param {table} self
+]]--
+function me.EnableMinimapButtonOnShow(self)
+  if mod.configuration.IsMinimapButtonEnabled() then
+    self:SetChecked(true)
+  else
+    self:SetChecked(false)
+  end
+end
+
+--[[
+  OnClick callback for checkbuttons - show or hide the minimap button
+
+  @param {table} self
+]]--
+function me.EnableMinimapButtonOnClick(self)
+  local enabled = self:GetChecked()
+
+  if enabled then
+    mod.configuration.EnableMinimapButton()
+  else
+    mod.configuration.DisableMinimapButton()
+  end
+
+  if mod.minimapButton ~= nil then
+    mod.minimapButton.Refresh()
   end
 end

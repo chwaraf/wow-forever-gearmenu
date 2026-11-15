@@ -79,8 +79,8 @@ describe("Core initialize", function()
     targetExists = true
 
     for _, name in ipairs({
-      "logger", "cmd", "configuration", "profile", "addonConfiguration", "keyBindProxy", "gearBar",
-      "gearBarChangeMenu", "trinketMenu", "keyBind", "comm"
+      "logger", "cmd", "configuration", "profile", "minimapButton", "addonConfiguration",
+      "keyBindProxy", "gearBar", "gearBarChangeMenu", "trinketMenu", "keyBind", "comm"
     }) do
       rggm[name] = recorder(name)
     end

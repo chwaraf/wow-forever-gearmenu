@@ -74,6 +74,7 @@ One file per test case under [test/manual/](manual/). Case IDs follow `TC-<AREA>
 | ID                                                | Case                                         |
 |---------------------------------------------------|----------------------------------------------|
 | [TC-OPT-01](manual/TC-OPT-01-enable-debug-log.md) | Enable Debug Log switches the log on and off |
+| [TC-OPT-02](manual/TC-OPT-02-minimap-button.md)   | Minimap button shows, drags, hides, and is a LibDBIcon button |
 
 ### ChangeMenu & swapping
 

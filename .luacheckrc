@@ -26,5 +26,11 @@ files = {
 
 exclude_files = {
   ".luacheckrc",
-  "target/"
+  "target/",
+  --[[
+    Vendored third-party libraries, unmodified and updated as a whole from their upstream
+    repositories (see libs/README.md). They use globals and call patterns of the client they were
+    written for - linting them would mean rewriting them, which defeats vendoring
+  ]]--
+  "libs/",
 }

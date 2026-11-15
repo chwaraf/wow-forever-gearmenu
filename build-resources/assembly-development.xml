@@ -16,6 +16,7 @@
         <include>code/*.lua</include>
         <include>gui/*.lua</include>
         <include>gui/*.xml</include>
+        <include>libs/embeds.xml</include>
         <include>libs/**/*.lua</include>
         <include>libs/**/*.xml</include>
         <include>test/*.lua</include>

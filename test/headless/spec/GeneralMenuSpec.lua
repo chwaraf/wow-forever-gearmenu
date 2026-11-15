@@ -51,7 +51,11 @@ local CHECK_BUTTON_OPTIONS = {
     "ELEMENT_GENERAL_OPT_ENABLE_FALLBACK_TO_BASE_ITEM", "EnableFallbackToBaseItem",
     "IsFallbackToBaseItemEnabled", "FallbackToBaseItem"
   },
-  { "ELEMENT_GENERAL_OPT_ENABLE_DEBUG_LOG", "EnableDebugLog", "IsDebugLogEnabled", "DebugLog" }
+  { "ELEMENT_GENERAL_OPT_ENABLE_DEBUG_LOG", "EnableDebugLog", "IsDebugLogEnabled", "DebugLog" },
+  {
+    "ELEMENT_GENERAL_OPT_ENABLE_MINIMAP_BUTTON", "EnableMinimapButton",
+    "IsMinimapButtonEnabled", "MinimapButton"
+  }
 }
 
 --[[

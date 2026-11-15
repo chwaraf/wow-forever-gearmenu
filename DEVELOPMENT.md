@@ -154,6 +154,9 @@ This generates a JUnit XML report in `./target/busted-junit.xml`.
 
 **Modules deliberately without a spec:**
 - `gui/AboutContent.lua` - builds a logo and four fixed font strings; no branches or state to pin
+- `libs/**` - vendored third-party libraries, loaded by `libs/embeds.xml`; they want the client's
+  string aliases and frame API from their first line, so a spec would test a stub of the client
+  rather than the library. `MinimapButtonSpec` covers the contract around them
 - `gui/QuickChangeMenu.lua` - deferred while QuickChange is disabled
   (`RGGM_CONSTANTS.QUICK_CHANGE_ENABLED`) (`code/QuickChange.lua` itself is covered by `QuickChangeSpec`)
 
@@ -447,6 +450,36 @@ Anything read from the client that the code then *reasons* about has to be check
 - `test/headless/WowStubs.lua` has `wowStubs.stubs.Secrets()` to reproduce the client in a spec. It
   hands out secrets that refuse every operation the client refuses and provides the matching
   `issecretvalue` to install, so a spec fails exactly where the client would
+
+## Minimap Button and Embedded Libraries
+
+The minimap button lives in `gui/MinimapButton.lua` and is rendered through two embedded libraries
+under `libs/` - `LibDataBroker-1.1` (publishes a `launcher` data object) and `LibDBIcon-1.0` (draws
+the round icon, saves its position). `libs/embeds.xml` loads them from the `.toc` before any addon
+code; `LibStub` and `CallbackHandler-1.0` come along as their dependencies.
+
+Why libraries and not an own button parented to `Minimap`: minimap addons (Leatrix Plus, SexyMap,
+the button collectors) discover addon icons by walking LibDBIcon's registry. A hand-rolled button is
+either left out of the button bag or replaced by a stand-in - Leatrix Plus calls those "non-standard
+buttons" and loses the tooltip and often the texture while replacing them. The registry is the only
+public contract there is, so it is what the addon targets.
+
+Consequences for the code:
+
+- `libs/` is vendored unmodified. Do not edit it and do not "fix" warnings in it - it is excluded
+  from `luacheck` and from the headless specs, and updating means overwriting the files from
+  upstream (see [libs/README.md](libs/README.md) for versions and source URLs)
+- the specs test the addon's *contract* with the libraries, not the libraries: `MinimapButtonSpec`
+  replaces `LibStub` with a recorder and asserts the data object, the registration and the click /
+  tooltip callbacks
+- `GearMenuConfiguration.minimapButton` is LibDBIcon's own storage shape (`hide`, `lock`,
+  `minimapPos` in degrees). LibDBIcon writes the dragged position into that table directly, so it
+  must stay the table that was handed to `Register` - a copy would stop persisting
+- hiding the icon only writes `hide` and calls `LibDBIcon:Refresh`. The data object stays registered,
+  which is what makes the checkbox take effect without a reload
+- the button is set up in `Core.Initialize` after `Configuration.SetupConfiguration` (which backfills
+  its saved state) and before the settings UI. The module tracks whether it registered, because
+  LibDBIcon raises on a duplicate name and `Initialize` can run again after a `/reload`
 
 ## Logging
 
