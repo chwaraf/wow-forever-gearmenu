@@ -60,6 +60,14 @@ local BUTTON_NAME = RGGM_CONSTANTS.ADDON_NAME
 local isRegistered = false
 
 --[[
+  Open the addon configuration. Deliberately a call through mod at click time: the icon is
+  registered before the settings categories exist, and the id is only known once they are built
+]]--
+local function OpenConfiguration()
+  mod.addonConfiguration.OpenMainCategory()
+end
+
+--[[
   Build the tooltip of the icon - what the left click does, plus the way to hide the icon
 
   @param {table} tooltip
@@ -72,13 +80,6 @@ local function ShowTooltip(tooltip)
   end
 
   tooltip:AddLine(rggm.L["minimap_button_tooltip_hide"], 1, 1, 1, true)
-end
-
---[[
-  Open the addon configuration
-]]--
-local function OpenConfiguration()
-  mod.addonConfiguration.OpenMainCategory()
 end
 
 --[[
